@@ -2,7 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 )
+
+var ErrNoSuchParcel = errors.New("no such parcel")
 
 type ParcelStore struct {
 	db *sql.DB
@@ -15,7 +18,6 @@ func NewParcelStore(db *sql.DB) ParcelStore {
 func (s ParcelStore) Add(p Parcel) (int, error) {
 	// реализуйте добавление строки в таблицу parcel, используйте данные из переменной p
 	res, err := s.db.Exec("INSERT INTO parcel (client, status, address, created_at) VALUES (:client, :status, :address, :created_at)",
-		//sql.Named("number", p.Number),
 		sql.Named("client", p.Client),
 		sql.Named("status", p.Status),
 		sql.Named("address", p.Address),
@@ -44,6 +46,9 @@ func (s ParcelStore) Get(number int) (Parcel, error) {
 		sql.Named("number", number))
 	err := row.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return Parcel{}, ErrNoSuchParcel
+		}
 		return Parcel{}, err
 	}
 
@@ -73,6 +78,10 @@ func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 		}
 
 		res = append(res, p)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return res, nil
@@ -107,11 +116,20 @@ func (s ParcelStore) SetAddress(number int, address string) error {
 func (s ParcelStore) Delete(number int) error {
 	// реализуйте удаление строки из таблицы parcel
 	// удалять строку можно только если значение статуса registered
-	_, err := s.db.Exec("DELETE FROM parcel WHERE number = :number and status = :status",
+	res, err := s.db.Exec("DELETE FROM parcel WHERE number = :number and status = :status",
 		sql.Named("number", number),
 		sql.Named("status", ParcelStatusRegistered))
 	if err != nil {
 		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrNoSuchParcel
 	}
 
 	return nil

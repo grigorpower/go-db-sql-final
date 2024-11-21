@@ -54,8 +54,8 @@ func TestAddGetDelete(t *testing.T) {
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
 	getParcel, err := store.Get(id)
 
-	require.NoError(t, err)
-	require.Equal(t, parcel, getParcel)
+	assert.NoError(t, err)
+	assert.Equal(t, parcel, getParcel)
 
 	// delete
 	// удалите добавленную посылку, убедитесь в отсутствии ошибки
@@ -65,6 +65,8 @@ func TestAddGetDelete(t *testing.T) {
 
 	_, err = store.Get(id)
 	require.Error(t, err)
+
+	assert.ErrorIs(t, err, ErrNoSuchParcel)
 }
 
 // TestSetAddress проверяет обновление адреса
@@ -99,8 +101,8 @@ func TestSetAddress(t *testing.T) {
 	// получите добавленную посылку и убедитесь, что адрес обновился
 	getParcel, err := store.Get(id)
 
-	require.NoError(t, err)
-	require.Equal(t, newAddress, getParcel.Address)
+	assert.NoError(t, err)
+	assert.Equal(t, newAddress, getParcel.Address)
 }
 
 // TestSetStatus проверяет обновление статуса
@@ -132,8 +134,8 @@ func TestSetStatus(t *testing.T) {
 	// получите добавленную посылку и убедитесь, что статус обновился
 	getParcel, err := store.Get(id)
 
-	require.NoError(t, err)
-	require.Equal(t, ParcelStatusSent, getParcel.Status)
+	assert.NoError(t, err)
+	assert.Equal(t, ParcelStatusSent, getParcel.Status)
 
 }
 
@@ -180,8 +182,8 @@ func TestGetByClient(t *testing.T) {
 
 	// убедитесь в отсутствии ошибки
 	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
-	require.NoError(t, err)
-	require.Len(t, parcels, len(storedParcels))
+	assert.NoError(t, err)
+	assert.Len(t, parcels, len(storedParcels))
 
 	// check
 	for _, parcel := range storedParcels {
@@ -189,11 +191,8 @@ func TestGetByClient(t *testing.T) {
 		// убедитесь, что все посылки из storedParcels есть в parcelMap
 		// убедитесь, что значения полей полученных посылок заполнены верно
 		storedParcel, exists := parcelMap[parcel.Number]
-		require.True(t, exists)
+		assert.True(t, exists)
 
-		assert.Equal(t, storedParcel.Client, parcel.Client)
-		assert.Equal(t, storedParcel.Status, parcel.Status)
-		assert.Equal(t, storedParcel.Address, parcel.Address)
-		assert.Equal(t, storedParcel.CreatedAt, parcel.CreatedAt)
+		assert.Equal(t, storedParcel, parcel)
 	}
 }
