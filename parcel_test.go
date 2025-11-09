@@ -19,7 +19,7 @@ var (
 	randRange = rand.New(randSource)
 )
 
-// getTestParcel возвращает тестовую посылку
+// getTestParcel возвращает тестовую посылку.
 func getTestParcel() Parcel {
 	return Parcel{
 		Client:    1000,
@@ -29,10 +29,10 @@ func getTestParcel() Parcel {
 	}
 }
 
-// TestAddGetDelete проверяет добавление, получение и удаление посылки
+// TestAddGetDelete проверяет добавление, получение и удаление посылки.
 func TestAddGetDelete(t *testing.T) {
 	// prepare
-	// настроиваем подключение к БД
+	// настраиваем подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
 	defer db.Close()
@@ -69,7 +69,7 @@ func TestAddGetDelete(t *testing.T) {
 	assert.ErrorIs(t, err, ErrNoSuchParcel)
 }
 
-// TestSetAddress проверяет обновление адреса
+// TestSetAddress проверяет обновление адреса.
 func TestSetAddress(t *testing.T) {
 	// prepare
 	// настраиваем подключение к БД
@@ -98,14 +98,14 @@ func TestSetAddress(t *testing.T) {
 	require.NoError(t, err)
 
 	// check
-	// получаем добавленную посылку и убедждаемся, что адрес обновился
+	// получаем добавленную посылку и убеждаемся, что адрес обновился
 	getParcel, err := store.Get(id)
 
 	assert.NoError(t, err)
 	assert.Equal(t, newAddress, getParcel.Address)
 }
 
-// TestSetStatus проверяет обновление статуса
+// TestSetStatus проверяет обновление статуса.
 func TestSetStatus(t *testing.T) {
 	// prepare
 	// настраиваем подключение к БД
@@ -139,7 +139,7 @@ func TestSetStatus(t *testing.T) {
 
 }
 
-// TestGetByClient проверяет получение посылок по идентификатору клиента
+// TestGetByClient проверяет получение посылок по идентификатору клиента.
 func TestGetByClient(t *testing.T) {
 	// prepare
 	// настраиваем подключение к БД

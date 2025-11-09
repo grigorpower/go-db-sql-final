@@ -9,14 +9,14 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-// Статус посылки
+// Статус посылки.
 const (
 	ParcelStatusRegistered = "registered"
 	ParcelStatusSent       = "sent"
 	ParcelStatusDelivered  = "delivered"
 )
 
-// Parcel структура посылки
+// Parcel структура посылки.
 type Parcel struct {
 	Number    int
 	Client    int
@@ -25,18 +25,18 @@ type Parcel struct {
 	CreatedAt string
 }
 
-// ParcelService сервис для управления посылками
+// ParcelService сервис для управления посылками.
 type ParcelService struct {
 	store ParcelStore
 }
 
-// NewParcelService создает новый экземпляр ParcelService
+// NewParcelService создает новый экземпляр ParcelService.
 func NewParcelService(store ParcelStore) ParcelService {
 	return ParcelService{store: store}
 }
 
-// Register создает новую посылку, заполняет поля структуры и добавляет запись в таблицу
-// Возвращает созданную посылку или ошибку в случае неудачи
+// Register создает новую посылку, заполняет поля структуры и добавляет запись в таблицу.
+// Возвращает созданную посылку или ошибку в случае неудачи.
 func (s ParcelService) Register(client int, address string) (Parcel, error) {
 	parcel := Parcel{
 		Client:    client,
@@ -58,8 +58,8 @@ func (s ParcelService) Register(client int, address string) (Parcel, error) {
 	return parcel, nil
 }
 
-// PrintClientParcels выводит информацию о всех посылках данного клиента
-// Возвращает ошибку если не удалось получить данные из таблицы
+// PrintClientParcels выводит информацию о всех посылках данного клиента.
+// Возвращает ошибку если не удалось получить данные из таблицы.
 func (s ParcelService) PrintClientParcels(client int) error {
 	parcels, err := s.store.GetByClient(client)
 	if err != nil {
@@ -77,9 +77,9 @@ func (s ParcelService) PrintClientParcels(client int) error {
 }
 
 // NextStatus меняет статус посылки:
-// зарегистрирована -> отправлена -> доставлена
-// Для доставленной посылки статус не меняется
-// Возвращает ошибку если посылка не найдена
+// зарегистрирована -> отправлена -> доставлена.
+// Для доставленной посылки статус не меняется.
+// Возвращает ошибку если посылка не найдена.
 func (s ParcelService) NextStatus(number int) error {
 	parcel, err := s.store.Get(number)
 	if err != nil {
@@ -101,14 +101,14 @@ func (s ParcelService) NextStatus(number int) error {
 	return s.store.SetStatus(number, nextStatus)
 }
 
-// ChangeAdress изменяет адрес доставки посылки
-// Возвращает ошику если посылка не найдена или не удалось обновить адрес
+// ChangeAdress изменяет адрес доставки посылки.
+// Возвращает ошибку если посылка не найдена или не удалось обновить адрес.
 func (s ParcelService) ChangeAddress(number int, address string) error {
 	return s.store.SetAddress(number, address)
 }
 
-// Delete удаляет посылку по номеру
-// Возвращает ошику если посылка не найдена или не удалось удалить запись
+// Delete удаляет посылку по номеру.
+// Возвращает ошибку если посылка не найдена или не удалось удалить запись.
 func (s ParcelService) Delete(number int) error {
 	return s.store.Delete(number)
 }
